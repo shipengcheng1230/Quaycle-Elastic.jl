@@ -5,3 +5,5 @@
 - Documents & Examples: [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://shipengcheng1230.github.io/Quaycle.jl/dev)
 
 - Status: ![Not Maintained](https://img.shields.io/badge/Repo%20Status-Achieved-yellow)
+
+- Building: [![Build Status](https://travis-ci.com/shipengcheng1230/Quaycle-ElasticPart.jl.svg?branch=master)](https://travis-ci.com/shipengcheng1230/Quaycle-ElasticPart.jl)
