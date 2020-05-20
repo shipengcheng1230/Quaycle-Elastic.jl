@@ -6,7 +6,10 @@
 
 - Status: ![Not Maintained](https://img.shields.io/badge/Repo%20Status-Achieved-yellow)
 
-- Building: [![Build Status](https://travis-ci.com/shipengcheng1230/Quaycle-ElasticPart.jl.svg?branch=master)](https://travis-ci.com/shipengcheng1230/Quaycle-ElasticPart.jl)
+- Building: [![Build Status](https://travis-ci.com/shipengcheng1230/Quaycle-Elastic.jl.svg?branch=master)](https://travis-ci.com/shipengcheng1230/Quaycle-Elastic.jl)
+
+- Citation: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3836243.svg)](https://doi.org/10.5281/zenodo.3836243)
+
 
 
 # JGR2020
