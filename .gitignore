@@ -14,7 +14,6 @@ deps/deps.jl
 *.bin
 *.jld
 *.jld2
-*.h5
 *.vtk
 *.vti
 *.vtu
