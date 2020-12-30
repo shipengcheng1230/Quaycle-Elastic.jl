@@ -43,21 +43,21 @@ macro h5savecallback(filename, tend, nsteps, usize, T)
                     h5open($filename, "r+") do f
                         d = d_open(f, "u")
                         d[$((:(:) for _ in 1: nd)...), total-rest+1: total+1] = selectdim(accu, $(nd+1), 1: rest+1)
-                        set_dims!(d, ($(usize.args...), total+1))
+                        HDF5.set_dims!(d, ($(usize.args...), total+1))
 
                         ht = d_open(f, "t")
                         ht[total-rest+1: total+1] = selectdim(acct, 1, 1: rest+1)
-                        set_dims!(ht, (total+1,))
+                        HDF5.set_dims!(ht, (total+1,))
                     end
                 elseif count > $(nsteps)
                     h5open($filename, "r+") do f
                         d = d_open(f, "u")
                         d[$((:(:) for _ in 1: nd)...), total-$(nsteps-1): total] = accu
-                        set_dims!(d, ($(usize.args...), total+$(nsteps)))
+                        HDF5.set_dims!(d, ($(usize.args...), total+$(nsteps)))
 
                         ht = d_open(f, "t")
                         ht[total-$(nsteps-1): total] = acct
-                        set_dims!(ht, (total+$(nsteps),))
+                        HDF5.set_dims!(ht, (total+$(nsteps),))
                     end
                     selectdim(accu, $(nd+1), 1) .= u
                     selectdim(acct, 1, 1) .= t
@@ -145,11 +145,11 @@ end
 function _trigger_save(b::H5SaveBuffer, ptrs, t)
     h5open(b.file, "r+") do f
         ht = d_open(f, b.tstr)
-        set_dims!(ht, (b.total + b.count - 1,))
+        HDF5.set_dims!(ht, (b.total + b.count - 1,))
         ht[b.total+1: b.total+b.count-1] = ifelse(b.count > b.nstep, b.tbuffer, selectdim(b.tbuffer, 1, 1: b.count-1))
         for i ∈ b.uiter
             hd = d_open(f, b.ustrs[i])
-            set_dims!(hd, (b.ushapes[i]..., b.total + b.count - 1))
+            HDF5.set_dims!(hd, (b.ushapes[i]..., b.total + b.count - 1))
             hd[b.idxs[i]..., b.total+1: b.total+b.count-1] = ifelse(b.count > b.nstep, b.ubuffer[b.ustrs[i]],
                 view(b.ubuffer[b.ustrs[i]], b.idxs[i]..., 1: b.count-1))
         end
