@@ -8,7 +8,8 @@
 
 - Building: [![Build Status](https://travis-ci.com/shipengcheng1230/Quaycle-Elastic.jl.svg?branch=master)](https://travis-ci.com/shipengcheng1230/Quaycle-Elastic.jl)
 
-- Citation: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3836243.svg)](https://doi.org/10.5281/zenodo.3836243)
+- Citation: Wei, M., & Pengcheng, S. (2021). Synchronization of earthquake cycles of adjacent segments on oceanic transform faults revealed by numerical simulation in the framework of rate-and-state friction. Journal of Geophysical Research: Solid Earth,
+126, e2020JB020231. https://doi.org/10.1029/2020JB020231
 
 
 
