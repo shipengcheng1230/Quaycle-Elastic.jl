@@ -1,4 +1,5 @@
 using Quaycle
+using GmshTools
 using HDF5
 using ProgressMeter
 
@@ -59,8 +60,8 @@ slip_magnitude(s::T, ds::T, μ::T=3e10) where T = (log10(μ * s * ds) - 9.1) / 1
 slip_magnitude(s::AbstractVector, ds::T, μ::T=3e10) where T = map(x -> slip_magnitude(x, ds, μ), s)
 
 ##
-function scan_output_01(filename; _stride=1)
-    fname = joinpath(@__DIR__, filename)
+function scan_output_01(filename; _stride=1, basedir="", edge=1e3)
+    fname = joinpath(dirname(@__DIR__), "out", basedir, filename)
     include(joinpath(@__DIR__, "s01-domain.jl"))
     @info "Reading: " * fname
 
@@ -71,8 +72,8 @@ function scan_output_01(filename; _stride=1)
     iterindex = 1: _stride: lent # no shift
     ti = td[iterindex]
     @info "Last year: " td[lent]/365/86400
-    patch_A = (@. -40e3 ≤ mf.x ≤ 0e3) .* (@. -7e3 ≤ mf.z ≤ 0e3)'
-    patch_B = (@. 0e3 ≤ mf.x ≤ 40e3) .* (@. -7e3 ≤ mf.z ≤ 0e3)'
+    patch_A = (@. -40e3 ≤ mf.x ≤ -edge) .* (@. -7e3 ≤ mf.z ≤ 0e3)'
+    patch_B = (@. edge ≤ mf.x ≤ 40e3) .* (@. -7e3 ≤ mf.z ≤ 0e3)'
     patch_F = trues(mf.nx, mf.nξ)
     patches = [patch_A, patch_B, patch_F]
     maxvs = [Vector{eltype(td[1])}(undef, length(iterindex)) for _ in 1: 3]
@@ -89,8 +90,10 @@ function scan_output_01(filename; _stride=1)
             maxvs[j][i] = maximum(tmps[j])
     	end
     end
-    ixb1, ixe1 = events_index(ti, maxvs[1], 1e-3; dura=1e7, stride=_stride)
-    ixb2, ixe2 = events_index(ti, maxvs[2], 1e-3; dura=1e7, stride=_stride)
+
+    ## 2e5 seconds for upper limit of seismic duration
+    ixb1, ixe1 = events_index(ti, maxvs[1], 1e-3; dura=2e5, stride=_stride)
+    ixb2, ixe2 = events_index(ti, maxvs[2], 1e-3; dura=2e5, stride=_stride)
 
     ss1 = accumulated_slip(fname, ixb1, ixe1)
     ss2 = accumulated_slip(fname, ixb2, ixe2)
@@ -111,7 +114,7 @@ function scan_output_01(filename; _stride=1)
         ribx, ribz, mw2 = Float64[], Float64[], Float64[]
     end
 
-    results = joinpath(@__DIR__, "res" * basename(fname)[3:end])
+    results = joinpath(dirname(@__DIR__), "out", basedir, "res" * basename(fname)[3:end])
     isfile(results) && rm(results)
     h5write(results, "maxva", maxvs[1])
     h5write(results, "maxvb", maxvs[2])
@@ -144,8 +147,8 @@ function coulomb_stress(gf, δ)
     τ = τa[1:nx,:]
 end
 
-function slip_ratio(fname, cutoff=:all)
-    f = joinpath(@__DIR__, fname)
+function slip_ratio(fname, cutoff=:all; basedir="")
+    f = joinpath(dirname(@__DIR__), "out", basedir, fname)
     include(joinpath(@__DIR__, "s01-domain.jl"))
     @info "Reading $(f)"
 
@@ -169,7 +172,7 @@ function slip_ratio(fname, cutoff=:all)
 
     for i in 1: size(maxv, 1)
         @info "Compute sr index: $(i)"
-        ixb_c, ixe_c = events_index(t, maxv[i, :], 1e-3; dura=1e7)
+        ixb_c, ixe_c = events_index(t, maxv[i, :], 1e-3; dura=2e5)
         ixb_a, ixe_a = events_index(t, maxv[i, :], 1e-6; dura=3e7)
         ixe_aa = map(x -> ixe_a[findfirst(>=(x), ixe_a)], ixe_c)
         @assert all(ixe_aa .≥ ixe_c)
@@ -184,7 +187,7 @@ function slip_ratio(fname, cutoff=:all)
     seis_ratio = sum(seis_slip[:, 1: cutoff]; dims=2) ./ sum(final_slip[:, 1: cutoff]; dims=2) |> vec
     after_ratio = sum(after_slip[:, 1: cutoff]; dims=2) ./ sum(final_slip[:, 1: cutoff]; dims=2) |> vec
 
-    results = joinpath(@__DIR__, "sr" * basename(fname)[3:end])
+    results = joinpath(dirname(@__DIR__), "out", basedir, "sr" * basename(fname)[3:end])
     isfile(results) && rm(results)
     h5write(results, "sr", seis_ratio)
     h5write(results, "ar", after_ratio)

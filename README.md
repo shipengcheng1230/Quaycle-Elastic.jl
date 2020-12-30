@@ -22,27 +22,44 @@ This repo constains the sample scripts for reproducing simulations and the outpu
     - `s03-parameters.jl`: set fault parameters
     - `s04-solve.jl`: solve models
     - `scanfunc.jl`: functions for computing event catalogues from raw output data
-    - `solve.job`: an example sbatch script for solving each model using one node (multi-threading)
+    - `solve.job`: an example sbatch script for solving each model using one node (multi-threading within node, array job)
 
 
 - outputs (for catalogue only):
 
-    All model outputs are in HDF5 file format. The names indicate: `catalogue-{parameter group}-{value}.h5`. LF denote left half fault, RF right half fault. Fields in the catalogue outputs are:
+    All model outputs are in HDF5. `ic{#}/` denotes different initial conditions. `extend/` contains extended simulations (up to 1200 or 1800 years, end-year is appened in those output names).
 
-    - `t`: time step in second (downsampled)
+    Catalog output names are like `resf-{parameter group}{value}.h5`. LF denote left half fault, RF right half fault. Fields in the catalogue outputs are:
+
+    - `t`: time step in second
+    - `ti`: time step in second (downsampled if `_stride != 1`)
     - `maxva`: max velocity in m/s (LF)
     - `maxvb`: max velocity in m/s (RF)
+    - `maxvf`: max velocity in m/s (whole fault)
     - `mwa`: moment magnitude (LF)
     - `mwb`: moment magnitude (RF)
-    - `ta`: event start time (LF)
-    - `tb`: event start time (RF)
+    - `ixba`: event start time (LF), correspond to `ti`
+    - `ixbb`: event start time (RF), correspond to `ti`
+    - `ixea`: event end index (LF), correspond to `ti`
+    - `ixeb`: event end index (RF), correspond to `ti`
+    - `riax`: event initial rutpure along strike position (m) (LF)
+    - `ribx`: event initial rutpure along strike position (m) (RF)
+    - `riaz`: event initial rutpure down dip position (m) (LF)
+    - `ribz`: event initial rutpure down dip strike position (m) (RF)
+
+
+    Slip ratio output names are like `srf-{parameter group}{value}.h5`. Fields in the catalogue outputs are:
+
     - `sr`: seismic ratio
     - `ar`: afterslip ratio
-    - `sync`: synchrony number
 
 
-    All solution outputs (not included in this repo) contains three fields by default:
+    `{output type}-s-{parameter group}{value}.h5` denote single VW model.
+
+    ODEs solution output names are like `otf-{parameter group}{value}.h5` (not included in this repo).
+    They contains three fields:
 
     - `t`: time step (s)
     - `v`: velocity (m/s)
+    - `θ`: state variable (s)
     - `δ`: displacement (m)

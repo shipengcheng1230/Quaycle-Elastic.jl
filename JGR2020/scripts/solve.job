@@ -1,18 +1,19 @@
 #!/bin/bash
 #
 #SBATCH --job-name=c2c
-#SBATCH --output=/data/weilab/spc/Kaer/log/c2c-%a.log
+#SBATCH --output=/data/weilab/spc/Kaer/log/c1c-%a.log
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=120G
-#SBATCH --array=1-40
+#SBATCH --array=1-3
+#SBATCH --exclude=n057,n060,n061,n062
 
 export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
-export JULIA_DEPOT_PATH=/home/pshi/softwares/julia-1.4-o-depot
 
 pwd
 hostname
 date
-srun ~/bin/juliaoo -O3 s04-solve.jl $SLURM_ARRAY_TASK_ID
+cd /data/weilab/spc/Kaer
+srun ~/bin/julia15 -O3 --math-mode=ieee job/ela.jl $SLURM_ARRAY_TASK_ID
 date
